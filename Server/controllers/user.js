@@ -27,6 +27,31 @@ export const createUser = async (req, res) => {
     }
 }
 
-export const signIn = () => {
-    
-}
+export const signIn = async (req, res) => {
+    const { email, password } = req.body;
+  
+    if (!email || !password)
+      return res
+        .status(400)
+        .json({ success: false, message: "Vui lòng điền đầy đủ thông tin !" });
+  
+    try {
+      //check username
+      const checkEmail = await UserModel.findOne({ email });
+      if (!checkEmail.email || checkEmail.password !== password)
+        return res
+          .status(400)
+          .json({ success: false, message: "Sai tên đăng nhập hoặc mật khẩu !" });
+
+      res.status(200).json({
+        success: true,
+        data: checkEmail,
+        message: "Đăng nhập thành công !",
+      });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error !!!" });
+    }
+  };
